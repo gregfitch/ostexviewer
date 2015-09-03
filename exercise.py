@@ -183,8 +183,8 @@ class Portfolio(object):
         html = re.sub(r"\|", r"&#124;", html)
         html = re.sub(r"(% ((&lt;)|<)!\[CDATA\[\n)", r"", html)
         html = re.sub(r"( %]](&gt;|>))", r"", html)
-        # with open('index2.txt', 'w+') as output:
-        #     output.write(html)
+        with open('index2.txt', 'w+') as output:
+            output.write(html)
         soup = BeautifulSoup(html, 'html.parser')
         for nav_string in soup(text=True):
             if isinstance(nav_string, CData):
