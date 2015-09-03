@@ -27,10 +27,28 @@ def fix_image(html):
         html = left + fix_image(right)
     return html
 
-def create_tag(tag_name, attrs_name=None):
-        if attrs_name:
-                return Tag(name=tag_name, attrs={'class': attrs_name})
-        return Tag(name=tag_name)
+def create_tag(parent, tag_name, attrs_name=None):
+    """
+    Create a new tag with tag_name and its attribute attrs_name and append it as
+    the child of the parent tag. 
+
+    params:
+    parent       -- the parent of the created tag
+    tag_name     -- name of the tag. For example, <div> has name "div"
+    attrs_name   -- optional. Name of the tag's attribute. For example, <div class="answer"> has attribute_name "answer">.
+
+    returns:
+    The created tag.
+    """
+    if attrs_name:
+            child = Tag(name=tag_name, attrs={'class': attrs_name})
+    else:
+            child = Tag(name=tag_name)
+    try:
+            parent.append(child)
+    except Exception as detail:
+            print "Get exception when appending tag:", detail
+    return child
 
 
 class Portfolio(object):
@@ -402,31 +420,21 @@ class Answer(object):
     def to_html(self, indent=0):
         id_number, version = self.parent.split('@')
         html = BeautifulSoup()
-        answer_wrapper = create_tag("div", "answer_wrapper")
-        selection = create_tag("div", "selection")
-        correctness = create_tag("div", "correctness")
-        check = create_tag("span", 'check' if float(self.correctness) > 0.0 else '')
-        letter = create_tag("div", "letter")
-        answer = create_tag("div", "answer")
-        answer_text_wrapper = create_tag("div", "answer_text_wrapper")
-        answer_text = create_tag("div", "answer_text")
-        feedback_wrapper = create_tag("div", "feedback_wrapper")
-        feedback = create_tag("div", "feedback")
-        span = create_tag("span")
-
+        answer_wrapper = Tag(name="div", attrs={'class': "answer_wrapper"})
         html.append(answer_wrapper)
-        answer_wrapper.append(selection)
-        answer_wrapper.append(answer)
-        selection.append(correctness)
-        selection.append(letter)
-        correctness.append(check)
-        letter.append(span)
+        selection = create_tag(answer_wrapper, "div", "selection")
+        answer = create_tag(answer_wrapper, "div", "answer")
+        correctness = create_tag(selection, "div", "correctness")
+        letter = create_tag(selection, "div", "letter")
+        answer_text_wrapper = create_tag(answer, "div", "answer_text_wrapper")
+        feedback_wrapper = create_tag(answer, "div", "feedback_wrapper")
+        check = create_tag(correctness, "span", 'check' if float(self.correctness) > 0.0 else '')
+        span = create_tag(letter, "span")
+        answer_text = create_tag(answer_text_wrapper, "div", "answer_text")
+        feedback = create_tag(feedback_wrapper, "div", "feedback")
+
         span.append(self.choice + ":")
-        answer.append(answer_text_wrapper)
-        answer.append(feedback_wrapper)
-        answer_text_wrapper.append(answer_text)
         answer_text.append(self.content_html)
-        feedback_wrapper.append(feedback)
         feedback.append(self.feedback_html)
         # html = \
         #     '''
